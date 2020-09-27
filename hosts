@@ -1,5 +1,5 @@
 [webservers]
-167.71.228.121
+143.110.182.234
 
 [all:vars]
 ansbile_user=root

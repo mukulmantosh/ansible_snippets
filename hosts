@@ -1,0 +1,10 @@
+[webservers]
+167.71.228.121
+
+[all:vars]
+ansbile_user=root
+ansible_ssh_private_key_file=/mnt/e/sample-test.pem
+mysql_root_password=KMUkIW3C@8eF8xgWp$sA
+mysql_custom_password=ROA&8hUxclQ4
+mysql_custom_username=mukul
+mysql_db_name=mukulmantosh

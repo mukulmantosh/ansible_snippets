@@ -1,0 +1,77 @@
+---
+- name: Setting up MySQL
+  no_log: True
+  hosts: webservers
+  become: True
+  tasks:
+    - name: Install MySQL
+      apt:
+        pkg:
+            - mysql-server
+            - mysql-client
+            - libmysqlclient-dev
+
+        state: present
+        update_cache: yes
+
+    - name: Start the MySQL service
+      action: service name=mysql state=started
+    
+    - name: Install PyMySQL
+      command: pip3 install pymysql
+
+
+    - name: Copy the root credentials as .my.cnf file
+      template: src=files/root.cnf.j2 dest=/etc/mysql/my.cnf mode=0600
+      notify: Restart MySQL
+
+    - name: Change the authentication plugin of MySQL root user to mysql_native_password
+      shell: mysql -u root -e 'UPDATE mysql.user SET plugin="mysql_native_password"  WHERE user="root" AND host="localhost"'
+
+    - name: Flush Privileges
+      shell: mysql -u root -e 'FLUSH PRIVILEGES'
+  
+    - name: Set MySQL root password
+      mysql_user:
+       login_host: 'localhost'
+       login_user: 'root'
+       login_password: ''
+       name: 'root'
+       password: '{{ mysql_root_password }}'
+       state: present      
+    
+    
+    - name: Removes anonymous user account for localhost
+      mysql_user:
+        login_host: 'localhost'
+        login_user: 'root'
+        login_password: '{{ mysql_root_password }}'
+        name: ''
+        host: localhost
+        state: absent   
+
+    - name: Create a new Database
+      mysql_db:
+        login_host: 'localhost'
+        login_user: 'root'
+        login_password: '{{ mysql_root_password }}'
+        name: '{{ mysql_db_name }}'
+        collation: utf8_unicode_ci
+        encoding: utf8
+        state: present
+
+    - name: Creates database user and password with database privileges
+      mysql_user:
+        login_host: 'localhost'
+        login_user: 'root'
+        login_password: '{{ mysql_root_password }}'
+        name: '{{ mysql_custom_username }}'
+        password: '{{ mysql_custom_password }}'
+        priv: '{{ mysql_db_name }}.*:ALL,GRANT'
+        state: present
+
+  handlers:
+    - name: Restart MySQL
+      service: name=mysql state=restarted
+        
+    

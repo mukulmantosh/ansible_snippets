@@ -6,6 +6,9 @@
     - name: Create Virtual Environment
       command: virtualenv /root/ProjectEnv -p python3
 
+    - name: Install Supervisor
+      apt: name=supervisor state=present update_cache=yes
+
     - name: Delete existing project folder
       file:
         path: "/root/projects/"
@@ -14,7 +17,7 @@
     - name: Git checkout
       git:
         repo: 'https://github.com/mukulmantosh/devops_django.git'
-        dest: /root/projects/
+        dest: /root/projects
         version: master
 
     - name: Install Python Requirements
@@ -22,7 +25,7 @@
         requirements: /root/projects/requirements.txt
         virtualenv: /root/ProjectEnv
     
-    - name: copy Django Production Settings File
+    - name: copy Django Production Settings
       copy: src=files/production_settings.py dest=/root/projects/devops_django/production_settings.py
 
     - name: Run DB Migrations
@@ -31,3 +34,12 @@
         app_path: "/root/projects"
         settings: "devops_django.production_settings"
         virtualenv: /root/ProjectEnv
+
+    - name: copy uWSGI INI Configuration
+      copy: src=files/backend.ini dest=/root/backend.ini
+
+    - name: Install uWSGI
+      pip: name=uwsgi
+
+    - name: Start uWSGI 
+      command: uwsgi --ini /root/backend.ini

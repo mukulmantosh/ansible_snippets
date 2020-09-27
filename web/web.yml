@@ -2,13 +2,14 @@
 - name: Deploying Webserver
   hosts: webservers
   become: True
+
   tasks:
     - name: Install Latest Version of NGINX Web Server
       apt: name=nginx state=latest update_cache=yes
     
     - name: copy NGINX Configuration file
-      copy: src=files/nginx.conf dest=/etc/nginx/conf.d/default
-      notify: restart nginx
+      copy: src=files/nginx.conf dest=/etc/nginx/conf.d/nginx.conf
+      notify: reload nginx
 
     - name: Ensure NGINX launches on boot
       command: systemctl enable nginx
@@ -16,3 +17,5 @@
   handlers:
     - name: restart nginx
       service: name=nginx state=restarted
+    - name: reload nginx
+      service: name=nginx state=reloaded

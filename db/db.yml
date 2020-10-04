@@ -26,7 +26,7 @@
 
 
     - name: Copy the root credentials as .my.cnf file
-      template: src=files/root.cnf.j2 dest=/etc/mysql/my.cnf mode=0600
+      template: src=templates/root.cnf.j2 dest=/etc/mysql/my.cnf mode=0600
       notify: Restart MySQL
 
     - name: Change the authentication plugin of MySQL root user to mysql_native_password

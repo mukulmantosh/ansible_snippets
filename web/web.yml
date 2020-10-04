@@ -2,13 +2,16 @@
 - name: Deploying Webserver
   hosts: webservers
   become: True
+  vars:
+    server_address: '139.59.51.62'
+    conf_file: /etc/nginx/conf.d/nginx.conf
 
   tasks:
     - name: Install Latest Version of NGINX Web Server
       apt: name=nginx state=latest update_cache=yes
     
     - name: copy NGINX Configuration file
-      copy: src=files/nginx.conf dest=/etc/nginx/conf.d/nginx.conf
+      copy: src=templates/nginx.conf.j2 dest={{ conf_file }}
       notify: reload nginx
 
     - name: Ensure NGINX launches on boot

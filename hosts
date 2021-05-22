@@ -1,6 +1,6 @@
 [webservers]
-157.245.98.153
-139.59.13.19
+127.0.0.1
+192.168.0.1
 
 [all:vars]
 ansible_user=root
